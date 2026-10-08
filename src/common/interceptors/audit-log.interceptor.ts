@@ -171,6 +171,9 @@ export class AuditLogInterceptor implements NestInterceptor {
                             // Creating an organization has no org context yet.
                             organizationId:
                                 organizationId ??
+                                (typeof record?.organizationId === 'string'
+                                    ? record.organizationId
+                                    : null) ??
                                 (options.entity === 'Organization'
                                     ? entityId
                                     : null),
@@ -198,10 +201,9 @@ export class AuditLogInterceptor implements NestInterceptor {
         options: AuditLogOptions,
         actorId: string | null,
     ): string | null {
+        if (options.actorIsEntity) return actorId;
         const value = request.params[options.idParam ?? 'id'];
-        if (typeof value !== 'string') return null;
-        // Routes such as DELETE /members/me refer to the caller.
-        return value === 'me' ? actorId : value;
+        return typeof value === 'string' ? value : null;
     }
 
     private async loadBefore(

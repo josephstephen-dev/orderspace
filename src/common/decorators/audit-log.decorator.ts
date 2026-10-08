@@ -27,6 +27,8 @@ export interface AuditLogOptions {
     action?: AuditAction;
     /** Route parameter holding the record ID. Defaults to "id". */
     idParam?: string;
+    /** Use the caller's user ID as the record ID, for routes like members/me. */
+    actorIsEntity?: boolean;
 }
 
 /**
