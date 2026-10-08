@@ -1,0 +1,21 @@
+echo "Running pre-commit checks..."
+
+echo "Checking TypeScript types..."
+if ! pnpm type-check; then
+    echo "TypeScript type check failed!"
+    exit 1
+fi
+
+echo "Checking code formatting..."
+if ! pnpm format --check; then
+    echo "Code formatting check failed! Run 'pnpm format' to fix."
+    exit 1
+fi
+
+echo "Linting code..."
+if ! pnpm lint; then
+    echo "Linting failed!"
+    exit 1
+fi
+
+echo "All pre-commit checks passed!"

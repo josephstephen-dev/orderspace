@@ -1,0 +1,28 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: orderspace_db
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-orderspace}
+    volumes:
+      - orderspace_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-orderspace}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - orderspace_network
+
+volumes:
+  orderspace_postgres_data:
+    driver: local
+
+networks:
+  orderspace_network:
+    driver: bridge

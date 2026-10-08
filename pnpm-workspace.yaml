@@ -1,0 +1,8 @@
+allowBuilds:
+  '@parcel/watcher': false
+  '@prisma/engines': false
+  '@scarf/scarf': false
+  bcrypt: false
+  msgpackr-extract: false
+  prisma: false
+  unrs-resolver: false
