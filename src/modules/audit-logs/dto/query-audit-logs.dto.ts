@@ -7,11 +7,11 @@ import {
     IsUUID,
 } from 'class-validator';
 import { PaginationQueryDto } from '../../../common/dto';
-import {
-    AUDIT_ENTITIES,
-    AuditEntity,
-} from '../../../common/decorators/audit-log.decorator';
+import { AUDIT_ENTITIES } from '../../../common/decorators/audit-log.decorator';
 import { AuditAction } from '../../../generated/prisma/enums';
+
+// Fix TS1272: Explicitly import AuditEntity as a type for isolatedModules
+import type { AuditEntity } from '../../../common/decorators/audit-log.decorator';
 
 /** The organization always comes from the URL, never from the query string. */
 export class QueryAuditLogsDto extends PaginationQueryDto {
@@ -25,7 +25,7 @@ export class QueryAuditLogsDto extends PaginationQueryDto {
     @IsEnum(AuditAction)
     action?: AuditAction;
 
-    @ApiPropertyOptional({ enum: AUDIT_ENTITIES, example: 'Order' })
+    @ApiPropertyOptional({ enum: AUDIT_ENTITIES, example: 'Order', type: () => String })
     @IsOptional()
     @IsIn(AUDIT_ENTITIES)
     entity?: AuditEntity;

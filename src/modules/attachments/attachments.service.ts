@@ -45,7 +45,7 @@ export class AttachmentsService {
     }
 
     async save(orderId: string, userId: string, dto: SaveAttachmentDto) {
-        await this.requireOrder(orderId);
+        const order = await this.requireOrder(orderId);
 
         const source = dto.source ?? AttachmentSource.UPLOAD;
         this.assertSourceIsConsistent(dto, source);
@@ -60,6 +60,7 @@ export class AttachmentsService {
         try {
             const created = await this.prisma.attachment.create({
                 data: {
+                    organizationId: order.organizationId,
                     orderId,
                     uploadedById: userId,
                     filename: dto.filename,
@@ -104,12 +105,13 @@ export class AttachmentsService {
 
     // ── Helpers ───────────────────────────────────────────────────────────
 
-    private async requireOrder(orderId: string): Promise<void> {
+    private async requireOrder(orderId: string): Promise<{ id: string; organizationId: string }> {
         const order = await this.prisma.order.findFirst({
             where: { id: orderId, deletedAt: null },
-            select: { id: true },
+            select: { id: true, organizationId: true },
         });
         if (!order) throw new NotFoundException('Order not found');
+        return order;
     }
 
     /**

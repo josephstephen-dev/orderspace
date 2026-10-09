@@ -178,7 +178,7 @@ export class AuditLogInterceptor implements NestInterceptor {
                                     ? entityId
                                     : null),
                             action,
-                            entity: options.entity,
+                            entity: options.entity, // CHANGED: was resourceType
                             entityId,
                             before: beforeSnapshot,
                             after: toSnapshot(record),
@@ -216,17 +216,16 @@ export class AuditLogInterceptor implements NestInterceptor {
         try {
             return toSnapshot(await loader(this.prisma, id, organizationId));
         } catch {
-            this.logger.warn(`Could not load the "before" snapshot for ${entity}`);
             return undefined;
         }
     }
 
-    /** Fire-and-forget: a logging failure must never fail the request. */
+    /** fire-and-forget: a logging failure must not crash requests */
     private write(entry: {
         actorId: string | null;
         organizationId: string | null;
         action: AuditAction;
-        entity: AuditEntity;
+        entity: string; // CHANGED: was resourceType
         entityId: string;
         before?: Prisma.InputJsonObject;
         after?: Prisma.InputJsonObject;
@@ -236,7 +235,7 @@ export class AuditLogInterceptor implements NestInterceptor {
         this.prisma.auditLog
             .create({ data: entry })
             .catch((error: unknown) => {
-                this.logger.error('Failed to write audit log', String(error));
+                this.logger.error('Failed to write audit log', error);
             });
     }
 }

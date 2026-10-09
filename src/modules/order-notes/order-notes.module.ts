@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { NotificationsModule } from 'notifications/notifications.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 import { OrderNotesController } from './order-notes.controller';
 import { OrderNotesService } from './order-notes.service';
 

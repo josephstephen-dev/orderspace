@@ -14,7 +14,7 @@ const PRODUCTS_PER_ALERT = 10;
 interface LowStockProduct {
     id: string;
     organizationId: string;
-    sku: string;
+    sku: string | null;
     name: string;
     stockQuantity: number;
     lowStockThreshold: number;
@@ -159,7 +159,7 @@ export class LowStockAlertService {
 
         const shown = products.slice(0, PRODUCTS_PER_ALERT).map((product) => ({
             id: product.id,
-            sku: product.sku,
+            sku: product.sku ?? '',
             name: product.name,
             stockQuantity: product.stockQuantity,
             lowStockThreshold: product.lowStockThreshold,
@@ -174,7 +174,7 @@ export class LowStockAlertService {
                     ? `Low stock: ${single.name}`
                     : `${products.length} products are low on stock`,
                 body: single
-                    ? `${single.sku} has ${single.stockQuantity} left (alert level ${single.lowStockThreshold}).`
+                    ? `${single.sku ?? single.name} has ${single.stockQuantity} left (alert level ${single.lowStockThreshold}).`
                     : shown
                           .slice(0, 3)
                           .map((product) => product.name)

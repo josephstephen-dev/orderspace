@@ -7,3 +7,327 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model User {
+  id                 String         @id @default(uuid())
+  email              String         @unique
+  name               String
+  password           String
+  avatarUrl          String?
+  globalRole         GlobalRole     @default(USER)
+  emailVerified      Boolean        @default(false)
+  isActive           Boolean        @default(true)
+  lastSeenAt         DateTime?
+  deletedAt          DateTime?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  attachments        Attachment[]
+  auditLogs          AuditLog[]
+  sentInvitations    Invitation[]
+  invitedMembers     Membership[]   @relation("MembershipInviter")
+  memberships        Membership[]   @relation("MembershipUser")
+  notifications      Notification[]
+  orderNotes         OrderNote[]
+  ownedOrganizations Organization[] @relation("OrganizationOwner")
+  otpCodes           OtpCode[]
+  refreshTokens      RefreshToken[]
+}
+
+model RefreshToken {
+  id           String    @id @default(uuid())
+  userId       String
+  tokenHash    String    @unique
+  expiresAt    DateTime
+  revokedAt    DateTime?
+  replacedById String?
+  createdAt    DateTime  @default(now())
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model OtpCode {
+  id        String     @id @default(uuid())
+  userId    String
+  purpose   OtpPurpose
+  codeHash  String
+  attempts  Int        @default(0)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime   @default(now())
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, purpose])
+  @@index([expiresAt])
+}
+
+model Organization {
+  id          String       @id @default(uuid())
+  name        String
+  slug        String       @unique
+  description String?
+  logoUrl     String?
+  website     String?
+  currency    String       @default("NGN")
+  ownerId     String
+  deletedAt   DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  attachments Attachment[]
+  auditLogs   AuditLog[]
+  categories  Category[]
+  customers   Customer[]
+  invitations Invitation[]
+  memberships Membership[]
+  orders      Order[]
+  owner       User         @relation("OrganizationOwner", fields: [ownerId], references: [id])
+  products    Product[]
+
+  @@index([ownerId])
+}
+
+model Membership {
+  userId         String
+  organizationId String
+  role           MembershipRole
+  invitedById    String?
+  joinedAt       DateTime       @default(now())
+  invitedBy      User?          @relation("MembershipInviter", fields: [invitedById], references: [id])
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User           @relation("MembershipUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, organizationId])
+  @@index([organizationId, role])
+}
+
+model Invitation {
+  id             String           @id @default(uuid())
+  email          String
+  organizationId String
+  role           MembershipRole
+  status         InvitationStatus @default(PENDING)
+  tokenHash      String           @unique
+  expiresAt      DateTime
+  sentById       String
+  acceptedAt     DateTime?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  sentBy         User             @relation(fields: [sentById], references: [id])
+
+  @@index([organizationId, status])
+  @@index([email])
+}
+
+model Notification {
+  id           String           @id @default(uuid())
+  userId       String
+  type         NotificationType
+  title        String
+  body         String?
+  isRead       Boolean          @default(false)
+  readAt       DateTime?
+  resourceType String?
+  resourceId   String?
+  meta         Json             @default("{}")
+  createdAt    DateTime         @default(now())
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead, createdAt])
+}
+
+model Category {
+  id             String       @id @default(uuid())
+  organizationId String
+  name           String
+  description    String?
+  deletedAt      DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  products       Product[]
+
+  @@index([organizationId])
+}
+
+model Customer {
+  id             String       @id @default(uuid())
+  organizationId String
+  name           String
+  email          String?
+  phone          String?
+  address        String?
+  deletedAt      DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  orders         Order[]
+
+  @@index([organizationId])
+}
+
+model Product {
+  id                String        @id @default(uuid())
+  organizationId    String
+  categoryId        String?
+  name              String
+  sku               String?
+  description       String?
+  price             Decimal       @default(0) @db.Decimal(12, 2)
+  stockQuantity     Int           @default(0)
+  lowStockThreshold Int           @default(5)
+  lowStockAlertedAt DateTime?
+  status            ProductStatus @default(ACTIVE)
+  deletedAt         DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  category          Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  organization      Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, status])
+  @@index([categoryId])
+}
+
+model Order {
+  id              String       @id @default(uuid())
+  organizationId  String
+  customerId      String?
+  orderNumber     Int
+  status          OrderStatus  @default(PENDING)
+  statusChangedAt DateTime     @default(now())
+  staleNotifiedAt DateTime?
+  customerName    String?
+  totalAmount     Decimal      @default(0) @db.Decimal(12, 2)
+  deletedAt       DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  attachments     Attachment[]
+  customer        Customer?    @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  notes           OrderNote[]
+
+  @@unique([organizationId, orderNumber])
+  @@index([organizationId, status])
+  @@index([status, statusChangedAt])
+  @@index([customerId])
+}
+
+model OrderNote {
+  id        String   @id @default(uuid())
+  orderId   String
+  authorId  String
+  body      String
+  isPinned  Boolean  @default(false)
+  isEdited  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  author    User     @relation(fields: [authorId], references: [id])
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId, createdAt])
+}
+
+model Attachment {
+  id             String           @id @default(uuid())
+  organizationId String
+  orderId        String
+  uploadedById   String?
+  filename       String
+  url            String
+  fileKey        String?
+  source         AttachmentSource @default(UPLOAD)
+  mimeType       String           @default("application/octet-stream")
+  size           Int              @default(0)
+  createdAt      DateTime         @default(now())
+  order          Order            @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  uploadedBy     User?            @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@index([orderId])
+}
+
+model AuditLog {
+  id             String        @id @default(uuid())
+  organizationId String?
+  actorId        String?
+  action         AuditAction
+  entity         String
+  entityId       String?
+  before         Json?
+  after          Json?
+  ipAddress      String?
+  userAgent      String?
+  createdAt      DateTime      @default(now())
+  actor          User?         @relation(fields: [actorId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId, createdAt])
+  @@index([actorId])
+  @@index([entity, entityId])
+}
+enum GlobalRole {
+  SUPER_ADMIN
+  USER
+}
+
+enum OtpPurpose {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
+
+enum MembershipRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  EXPIRED
+  REVOKED
+}
+
+enum NotificationType {
+  LOW_STOCK
+  MEMBER_JOINED
+  MEMBER_REMOVED
+  ORDER_NOTE_ADDED
+  ORDER_STALE
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  ARCHIVE
+  RESTORE
+  STATUS_CHANGE
+  INVITE
+  JOIN
+  LEAVE
+}
+
+enum AttachmentSource {
+  UPLOAD
+  URL
+}
+
+enum ProductStatus {
+  ACTIVE
+  DRAFT
+  ARCHIVED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}

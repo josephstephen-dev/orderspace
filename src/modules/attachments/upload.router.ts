@@ -23,7 +23,7 @@ function getVerifier(): JwtService {
  * This route checks the access token itself. Membership is checked later, when
  * the file is attached to an order.
  */
-export const uploadRouter = {
+export const uploadRouter: FileRouter = {
     orderAttachment: f({
         image: { maxFileSize: '8MB', maxFileCount: 5 },
         pdf: { maxFileSize: '16MB', maxFileCount: 3 },
@@ -51,6 +51,6 @@ export const uploadRouter = {
             size: file.size,
             type: file.type,
         })),
-} satisfies FileRouter;
+};
 
 export type OrderspaceFileRouter = typeof uploadRouter;
