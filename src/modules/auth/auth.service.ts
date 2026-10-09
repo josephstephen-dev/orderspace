@@ -18,10 +18,7 @@ import {
     hashOtp,
     verifyOtp,
 } from '../../common/utils/otp.util';
-import {
-    generateSecureToken,
-    hmacToken,
-} from '../../common/utils/token.util';
+import { generateSecureToken, hmacToken } from '../../common/utils/token.util';
 import { JwtConfig, durationToMs } from '../../config';
 import { PrismaService } from '../../database/prisma.service';
 import type { Prisma } from '../../generated/prisma/client';
@@ -262,7 +259,10 @@ export class AuthService {
         return new UserEntity(user);
     }
 
-    async changePassword(userId: string, dto: ChangePasswordDto): Promise<void> {
+    async changePassword(
+        userId: string,
+        dto: ChangePasswordDto,
+    ): Promise<void> {
         const user = await this.findActiveUser(userId);
 
         if (!(await bcrypt.compare(dto.currentPassword, user.password))) {

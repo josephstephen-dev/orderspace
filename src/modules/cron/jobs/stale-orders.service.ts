@@ -25,10 +25,15 @@ export class StaleOrdersService {
         private readonly membershipsService: MembershipsService,
     ) {}
 
-    @Cron(CronExpression.EVERY_DAY_AT_8AM, { name: 'stale-orders', timeZone: 'UTC' })
+    @Cron(CronExpression.EVERY_DAY_AT_8AM, {
+        name: 'stale-orders',
+        timeZone: 'UTC',
+    })
     handle(): Promise<void> {
         return runJob(this.logger, 'Stale-order reminder', async () => {
-            const cutoff = new Date(Date.now() - STALE_AFTER_DAYS * 24 * 60 * 60 * 1000);
+            const cutoff = new Date(
+                Date.now() - STALE_AFTER_DAYS * 24 * 60 * 60 * 1000,
+            );
 
             const candidates = await this.prisma.order.findMany({
                 where: {
@@ -43,7 +48,10 @@ export class StaleOrdersService {
                 take: MAX_ORDERS_PER_RUN,
             });
 
-            const claimed = new Map<string, Array<{ id: string; orderNumber: number }>>();
+            const claimed = new Map<
+                string,
+                Array<{ id: string; orderNumber: number }>
+            >();
             for (const order of candidates) {
                 const { count } = await this.prisma.order.updateMany({
                     where: { id: order.id, staleNotifiedAt: null },
@@ -55,9 +63,10 @@ export class StaleOrdersService {
                 claimed.set(order.organizationId, list);
             }
 
-            const recipients = await this.membershipsService.findAdminRecipients([
-                ...claimed.keys(),
-            ]);
+            const recipients =
+                await this.membershipsService.findAdminRecipients([
+                    ...claimed.keys(),
+                ]);
 
             let alerted = 0;
             let orders = 0;
@@ -66,14 +75,20 @@ export class StaleOrdersService {
                 const admins = recipients.get(organizationId) ?? [];
                 if (admins.length === 0) continue;
                 try {
-                    await this.notify(organizationId, list, admins.map((admin) => admin.id));
+                    await this.notify(
+                        organizationId,
+                        list,
+                        admins.map((admin) => admin.id),
+                    );
                     alerted += 1;
                 } catch (error) {
                     await this.prisma.order.updateMany({
                         where: { id: { in: list.map((order) => order.id) } },
                         data: { staleNotifiedAt: null },
                     });
-                    this.logger.warn(`Reminder for ${organizationId} failed: ${String(error)}`);
+                    this.logger.warn(
+                        `Reminder for ${organizationId} failed: ${String(error)}`,
+                    );
                 }
             }
             return `${orders} stale order(s), ${alerted} organization(s) notified`;
@@ -105,7 +120,9 @@ export class StaleOrdersService {
             meta: {
                 organizationId,
                 totalCount: orders.length,
-                orderIds: orders.slice(0, ORDERS_PER_ALERT).map((order) => order.id),
+                orderIds: orders
+                    .slice(0, ORDERS_PER_ALERT)
+                    .map((order) => order.id),
             },
         });
     }

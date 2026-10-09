@@ -14,11 +14,16 @@ import { hasMinimumRole } from '../../common/utils/role.util';
 import type { AppConfig } from '../../config';
 import { PrismaService } from '../../database/prisma.service';
 import { AttachmentSource, MembershipRole } from '../../generated/prisma/enums';
-import { MAX_ATTACHMENTS_PER_ORDER, isUploadThingHost } from './attachments.constants';
+import {
+    MAX_ATTACHMENTS_PER_ORDER,
+    isUploadThingHost,
+} from './attachments.constants';
 import { SaveAttachmentDto } from './dto';
 import { AttachmentEntity } from './entities';
 
-const UPLOADER_INCLUDE = { uploadedBy: { select: { id: true, name: true } } } as const;
+const UPLOADER_INCLUDE = {
+    uploadedBy: { select: { id: true, name: true } },
+} as const;
 
 @Injectable()
 export class AttachmentsService {
@@ -50,7 +55,9 @@ export class AttachmentsService {
         const source = dto.source ?? AttachmentSource.UPLOAD;
         this.assertSourceIsConsistent(dto, source);
 
-        const count = await this.prisma.attachment.count({ where: { orderId } });
+        const count = await this.prisma.attachment.count({
+            where: { orderId },
+        });
         if (count >= MAX_ATTACHMENTS_PER_ORDER) {
             throw new ConflictException(
                 `An order can have at most ${MAX_ATTACHMENTS_PER_ORDER} attachments`,
@@ -90,7 +97,10 @@ export class AttachmentsService {
         if (!attachment) throw new NotFoundException('Attachment not found');
 
         const isUploader = attachment.uploadedById === actor.userId;
-        if (!isUploader && !hasMinimumRole(actor.role, [MembershipRole.ADMIN])) {
+        if (
+            !isUploader &&
+            !hasMinimumRole(actor.role, [MembershipRole.ADMIN])
+        ) {
             throw new ForbiddenException(
                 'Only the uploader or an admin can remove an attachment',
             );
@@ -98,14 +108,19 @@ export class AttachmentsService {
 
         await this.prisma.attachment.delete({ where: { id: attachmentId } });
 
-        if (attachment.source === AttachmentSource.UPLOAD && attachment.fileKey) {
+        if (
+            attachment.source === AttachmentSource.UPLOAD &&
+            attachment.fileKey
+        ) {
             await this.deleteFromCdn(attachment.fileKey);
         }
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────
 
-    private async requireOrder(orderId: string): Promise<{ id: string; organizationId: string }> {
+    private async requireOrder(
+        orderId: string,
+    ): Promise<{ id: string; organizationId: string }> {
         const order = await this.prisma.order.findFirst({
             where: { id: orderId, deletedAt: null },
             select: { id: true, organizationId: true },
@@ -119,16 +134,23 @@ export class AttachmentsService {
      * its URL. Without this, someone could register another file's key and then
      * delete that file from storage by deleting the attachment.
      */
-    private assertSourceIsConsistent(dto: SaveAttachmentDto, source: AttachmentSource): void {
+    private assertSourceIsConsistent(
+        dto: SaveAttachmentDto,
+        source: AttachmentSource,
+    ): void {
         if (source === AttachmentSource.URL) {
             if (dto.fileKey) {
-                throw new BadRequestException('fileKey is only valid for uploaded files');
+                throw new BadRequestException(
+                    'fileKey is only valid for uploaded files',
+                );
             }
             return;
         }
 
         if (!dto.fileKey) {
-            throw new BadRequestException('fileKey is required for uploaded files');
+            throw new BadRequestException(
+                'fileKey is required for uploaded files',
+            );
         }
         let url: URL;
         try {
@@ -151,7 +173,9 @@ export class AttachmentsService {
             this.utapi ??= new UTApi();
             await this.utapi.deleteFiles(fileKey);
         } catch (error) {
-            this.logger.warn(`Could not delete ${fileKey} from UploadThing: ${String(error)}`);
+            this.logger.warn(
+                `Could not delete ${fileKey} from UploadThing: ${String(error)}`,
+            );
         }
     }
 }

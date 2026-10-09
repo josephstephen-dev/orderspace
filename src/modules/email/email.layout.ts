@@ -26,7 +26,10 @@ export function button(label: string, href: string): string {
     return `<p style="margin:0 0 16px;"><a href="${escapeHtml(href)}" style="display:inline-block;padding:12px 20px;background:#111827;color:#ffffff;text-decoration:none;border-radius:6px;font-size:15px;">${escapeHtml(label)}</a></p>`;
 }
 
-export function table(headers: string[], rows: Array<Array<string | number>>): string {
+export function table(
+    headers: string[],
+    rows: Array<Array<string | number>>,
+): string {
     const head = headers
         .map(
             (h) =>

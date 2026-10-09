@@ -12,7 +12,8 @@ export class CreateInvitationDto {
     @ApiPropertyOptional({
         enum: ASSIGNABLE_ROLES,
         default: MembershipRole.MEMBER,
-        description: 'Role granted on acceptance. Limited to roles below your own.',
+        description:
+            'Role granted on acceptance. Limited to roles below your own.',
     })
     @IsOptional()
     @IsIn(ASSIGNABLE_ROLES)

@@ -1,6 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { maskEmail } from '../../../common/utils/format.util';
-import { InvitationStatus, MembershipRole } from '../../../generated/prisma/enums';
+import {
+    InvitationStatus,
+    MembershipRole,
+} from '../../../generated/prisma/enums';
 
 /** A pending invitation past its expiry date reads as EXPIRED right away. */
 export function effectiveInvitationStatus(source: {
@@ -48,7 +51,8 @@ export class InvitationEntity {
     @ApiProperty({ enum: InvitationStatus }) status: InvitationStatus;
     @ApiProperty({ type: String, format: 'date-time' }) expiresAt: Date;
     @ApiProperty() sentById: string;
-    @ApiProperty({ type: String, format: 'date-time', nullable: true }) acceptedAt: Date | null;
+    @ApiProperty({ type: String, format: 'date-time', nullable: true })
+    acceptedAt: Date | null;
     @ApiProperty({ type: String, format: 'date-time' }) createdAt: Date;
     @ApiProperty({ type: String, format: 'date-time' }) updatedAt: Date;
     @ApiProperty({ type: InvitationOrganizationEntity, required: false })

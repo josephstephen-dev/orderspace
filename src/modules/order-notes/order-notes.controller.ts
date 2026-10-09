@@ -50,7 +50,8 @@ export class OrderNotesController {
     @OrgAccess(MembershipRole.VIEWER)
     @ApiOperation({
         summary: 'List internal notes on an order',
-        description: 'Pinned notes first, then newest first. Customers never see notes.',
+        description:
+            'Pinned notes first, then newest first. Customers never see notes.',
     })
     @ApiPageResponse(OrderNoteEntity)
     findAll(
@@ -75,7 +76,12 @@ export class OrderNotesController {
         @CurrentUser('sub') userId: string,
         @Body() dto: CreateOrderNoteDto,
     ) {
-        return this.orderNotesService.create(organizationId, orderId, userId, dto);
+        return this.orderNotesService.create(
+            organizationId,
+            orderId,
+            userId,
+            dto,
+        );
     }
 
     @Patch(':noteId')
@@ -83,7 +89,8 @@ export class OrderNotesController {
     @AuditLog({ entity: 'OrderNote', idParam: 'noteId' })
     @ApiOperation({
         summary: 'Edit or pin a note',
-        description: 'Only the author can change the text. Any member can pin or unpin.',
+        description:
+            'Only the author can change the text. Any member can pin or unpin.',
     })
     @ApiParam({ name: 'noteId', description: 'Note ID' })
     @ApiOkResponse({ type: OrderNoteEntity })
@@ -112,7 +119,8 @@ export class OrderNotesController {
     @AuditLog({ entity: 'OrderNote', idParam: 'noteId' })
     @ApiOperation({
         summary: 'Delete a note',
-        description: 'The author or an admin. The audit log keeps the original text.',
+        description:
+            'The author or an admin. The audit log keeps the original text.',
     })
     @ApiParam({ name: 'noteId', description: 'Note ID' })
     @ApiNoContentResponse({ description: 'Note deleted' })

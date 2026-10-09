@@ -100,12 +100,15 @@ export class AuthController {
     @Throttle(CREDENTIAL_LIMIT)
     @ApiOperation({
         summary: 'Log in',
-        description: 'Exchanges email and password for an access and refresh token.',
+        description:
+            'Exchanges email and password for an access and refresh token.',
     })
     @ApiOkResponse({ type: AuthResponseEntity })
     @ApiBadRequestResponse({ description: 'Validation failed' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
-    @ApiForbiddenResponse({ description: 'Account deactivated or email not verified' })
+    @ApiForbiddenResponse({
+        description: 'Account deactivated or email not verified',
+    })
     login(@Body() dto: LoginDto) {
         return this.authService.login(dto);
     }
@@ -120,7 +123,9 @@ export class AuthController {
             'Each refresh token works once. Replaying a used token revokes every session of that user.',
     })
     @ApiOkResponse({ type: AuthResponseEntity })
-    @ApiUnauthorizedResponse({ description: 'Invalid, revoked or expired refresh token' })
+    @ApiUnauthorizedResponse({
+        description: 'Invalid, revoked or expired refresh token',
+    })
     refresh(@Body() dto: RefreshTokenDto) {
         return this.authService.refresh(dto);
     }
@@ -193,7 +198,9 @@ export class AuthController {
         description: 'Revokes every active session, including this one.',
     })
     @ApiNoContentResponse({ description: 'Password changed' })
-    @ApiBadRequestResponse({ description: 'Validation failed or current password wrong' })
+    @ApiBadRequestResponse({
+        description: 'Validation failed or current password wrong',
+    })
     async changePassword(
         @CurrentUser('sub') userId: string,
         @Body() dto: ChangePasswordDto,

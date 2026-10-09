@@ -1,5 +1,10 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+    ApiOkResponse,
+    ApiOperation,
+    ApiParam,
+    ApiTags,
+} from '@nestjs/swagger';
 import { ApiOrgAccess, OrgId, Roles } from '../../common/decorators';
 import { OrgMemberGuard, RolesGuard } from '../../common/guards';
 import { MembershipRole } from '../../generated/prisma/enums';
@@ -23,7 +28,10 @@ export class AuditLogsController {
     })
     @ApiParam({ name: 'orgId', description: 'Organization ID' })
     @ApiOkResponse({ type: AuditLogPageEntity })
-    findAll(@OrgId() organizationId: string, @Query() query: QueryAuditLogsDto) {
+    findAll(
+        @OrgId() organizationId: string,
+        @Query() query: QueryAuditLogsDto,
+    ) {
         return this.auditLogsService.findAll(organizationId, query);
     }
 }

@@ -7,7 +7,8 @@ export class UpdateMemberRoleDto {
     @ApiProperty({
         enum: ASSIGNABLE_ROLES,
         example: MembershipRole.MEMBER,
-        description: 'OWNER cannot be assigned here. Use the transfer endpoint.',
+        description:
+            'OWNER cannot be assigned here. Use the transfer endpoint.',
     })
     @IsIn(ASSIGNABLE_ROLES)
     role: MembershipRole;

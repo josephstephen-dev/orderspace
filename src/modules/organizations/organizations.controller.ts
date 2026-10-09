@@ -53,7 +53,8 @@ export class OrganizationsController {
     @AuditLog({ entity: 'Organization' })
     @ApiOperation({
         summary: 'Create an organization',
-        description: 'You become its owner. A slug is generated from the name when omitted.',
+        description:
+            'You become its owner. A slug is generated from the name when omitted.',
     })
     @ApiCreatedResponse({ type: MyOrganizationEntity })
     @ApiConflictResponse({ description: 'Slug already taken' })
@@ -92,11 +93,14 @@ export class OrganizationsController {
     @AuditLog({ entity: 'Organization' })
     @ApiOperation({
         summary: 'Update an organization',
-        description: 'The slug is permanent. The currency can only change before the first order.',
+        description:
+            'The slug is permanent. The currency can only change before the first order.',
     })
     @ApiParam({ name: 'id', description: 'Organization ID' })
     @ApiOkResponse({ type: OrganizationEntity })
-    @ApiConflictResponse({ description: 'Currency cannot change once orders exist' })
+    @ApiConflictResponse({
+        description: 'Currency cannot change once orders exist',
+    })
     update(
         @Param('id', ParseUUIDPipe) id: string,
         @Body() dto: UpdateOrganizationDto,
@@ -146,7 +150,8 @@ export class OrganizationsController {
     @AuditLog({ entity: 'Organization', action: AuditAction.UPDATE })
     @ApiOperation({
         summary: 'Transfer ownership',
-        description: 'The new owner must be an active member. You become an admin.',
+        description:
+            'The new owner must be an active member. You become an admin.',
     })
     @ApiParam({ name: 'id', description: 'Organization ID' })
     @ApiOkResponse({ type: OrganizationEntity })

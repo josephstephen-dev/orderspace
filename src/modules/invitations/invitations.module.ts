@@ -1,7 +1,10 @@
 import { Module } from '@nestjs/common';
 import { MembershipsModule } from '../memberships/memberships.module';
 import { NotificationsModule } from '../notifications/notifications.module';
-import { InvitationsController, OrgInvitationsController } from './invitations.controller';
+import {
+    InvitationsController,
+    OrgInvitationsController,
+} from './invitations.controller';
 import { InvitationsService } from './invitations.service';
 
 @Module({

@@ -57,7 +57,9 @@ export class AttachmentsController {
             'Call this after the browser has uploaded the file through /api/uploadthing. An order holds at most 20 attachments.',
     })
     @ApiCreatedResponse({ type: AttachmentEntity })
-    @ApiConflictResponse({ description: 'Already attached, or the order is full' })
+    @ApiConflictResponse({
+        description: 'Already attached, or the order is full',
+    })
     save(
         @Param('orderId', ParseUUIDPipe) orderId: string,
         @CurrentUser('sub') userId: string,
@@ -72,7 +74,8 @@ export class AttachmentsController {
     @AuditLog({ entity: 'Attachment' })
     @ApiOperation({
         summary: 'Remove an attachment',
-        description: 'The uploader or an admin. Uploaded files are deleted from storage too.',
+        description:
+            'The uploader or an admin. Uploaded files are deleted from storage too.',
     })
     @ApiParam({ name: 'id', description: 'Attachment ID' })
     @ApiNoContentResponse({ description: 'Attachment removed' })

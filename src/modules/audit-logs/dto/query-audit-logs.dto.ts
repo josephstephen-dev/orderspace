@@ -25,7 +25,11 @@ export class QueryAuditLogsDto extends PaginationQueryDto {
     @IsEnum(AuditAction)
     action?: AuditAction;
 
-    @ApiPropertyOptional({ enum: AUDIT_ENTITIES, example: 'Order', type: () => String })
+    @ApiPropertyOptional({
+        enum: AUDIT_ENTITIES,
+        example: 'Order',
+        type: () => String,
+    })
     @IsOptional()
     @IsIn(AUDIT_ENTITIES)
     entity?: AuditEntity;

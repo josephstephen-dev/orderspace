@@ -25,13 +25,16 @@ export interface AuditLogSourceRecord {
 
 export class AuditLogEntity {
     @ApiProperty() id: string;
-    @ApiProperty({ type: String, nullable: true }) organizationId: string | null;
+    @ApiProperty({ type: String, nullable: true }) organizationId:
+        string | null;
     @ApiProperty({ type: String, nullable: true }) actorId: string | null;
     @ApiProperty({ enum: AuditAction }) action: AuditAction;
     @ApiProperty({ example: 'Product' }) entity: string;
     @ApiProperty({ type: String, nullable: true }) entityId: string | null;
-    @ApiProperty({ type: Object, nullable: true }) before: Prisma.JsonValue | null;
-    @ApiProperty({ type: Object, nullable: true }) after: Prisma.JsonValue | null;
+    @ApiProperty({ type: Object, nullable: true })
+    before: Prisma.JsonValue | null;
+    @ApiProperty({ type: Object, nullable: true })
+    after: Prisma.JsonValue | null;
     @ApiProperty({ type: String, nullable: true }) ipAddress: string | null;
     @ApiProperty({ type: String, nullable: true }) userAgent: string | null;
     @ApiProperty({ type: String, format: 'date-time' }) createdAt: Date;

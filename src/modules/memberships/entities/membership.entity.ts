@@ -18,7 +18,11 @@ export class MembershipEntity {
     @ApiProperty({ enum: MembershipRole, example: MembershipRole.MEMBER })
     role: MembershipRole;
 
-    @ApiProperty({ type: String, nullable: true, description: 'Who invited this member' })
+    @ApiProperty({
+        type: String,
+        nullable: true,
+        description: 'Who invited this member',
+    })
     invitedById: string | null;
 
     @ApiProperty({ type: String, format: 'date-time' })

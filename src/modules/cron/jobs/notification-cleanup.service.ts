@@ -14,7 +14,10 @@ export class NotificationCleanupService {
 
     constructor(private readonly prisma: PrismaService) {}
 
-    @Cron(CronExpression.EVERY_DAY_AT_3AM, { name: 'notification-cleanup', timeZone: 'UTC' })
+    @Cron(CronExpression.EVERY_DAY_AT_3AM, {
+        name: 'notification-cleanup',
+        timeZone: 'UTC',
+    })
     handle(): Promise<void> {
         return runJob(this.logger, 'Notification cleanup', async () => {
             const now = Date.now();
@@ -23,9 +26,17 @@ export class NotificationCleanupService {
                     OR: [
                         {
                             isRead: true,
-                            readAt: { lt: new Date(now - READ_RETENTION_DAYS * DAY_MS) },
+                            readAt: {
+                                lt: new Date(
+                                    now - READ_RETENTION_DAYS * DAY_MS,
+                                ),
+                            },
                         },
-                        { createdAt: { lt: new Date(now - MAX_RETENTION_DAYS * DAY_MS) } },
+                        {
+                            createdAt: {
+                                lt: new Date(now - MAX_RETENTION_DAYS * DAY_MS),
+                            },
+                        },
                     ],
                 },
             });

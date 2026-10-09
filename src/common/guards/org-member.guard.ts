@@ -20,7 +20,9 @@ export class OrgMemberGuard implements CanActivate {
     constructor(private readonly prisma: PrismaService) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
-        const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
+        const request = context
+            .switchToHttp()
+            .getRequest<AuthenticatedRequest>();
         const user = request.user;
         if (!user) {
             throw new UnauthorizedException('Authentication required');

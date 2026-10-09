@@ -15,7 +15,12 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { QueryMembersDto, UpdateMemberRoleDto } from './dto';
 import { MembershipEntity } from './entities';
 
-const USER_SELECT = { id: true, name: true, email: true, avatarUrl: true } as const;
+const USER_SELECT = {
+    id: true,
+    name: true,
+    email: true,
+    avatarUrl: true,
+} as const;
 
 export interface AdminRecipient {
     id: string;
@@ -87,7 +92,9 @@ export class MembershipsService {
             );
         }
         if (!outranks(actor.role, dto.role)) {
-            throw new ForbiddenException('You can only assign roles below your own');
+            throw new ForbiddenException(
+                'You can only assign roles below your own',
+            );
         }
 
         const updated = await this.prisma.membership.update({
@@ -108,10 +115,14 @@ export class MembershipsService {
         const target = await this.findMembership(organizationId, targetUserId);
 
         if (target.userId === actor.userId) {
-            throw new BadRequestException('Use the leave endpoint to remove yourself');
+            throw new BadRequestException(
+                'Use the leave endpoint to remove yourself',
+            );
         }
         if (target.role === MembershipRole.OWNER) {
-            throw new ForbiddenException('The organization owner cannot be removed');
+            throw new ForbiddenException(
+                'The organization owner cannot be removed',
+            );
         }
         if (!outranks(actor.role, target.role)) {
             throw new ForbiddenException(

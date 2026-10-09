@@ -5,7 +5,10 @@ export class NotificationEntity {
     @ApiProperty({ example: '0b8a6c44-6b9d-4b9f-9a77-1d5f3d1f0a21' })
     id: string;
 
-    @ApiProperty({ enum: NotificationType, example: NotificationType.LOW_STOCK })
+    @ApiProperty({
+        enum: NotificationType,
+        example: NotificationType.LOW_STOCK,
+    })
     type: NotificationType;
 
     @ApiProperty({ example: '3 products are low on stock' })
@@ -28,7 +31,8 @@ export class NotificationEntity {
 
     @ApiProperty({
         type: Object,
-        description: 'Extra context, such as the organization the event belongs to',
+        description:
+            'Extra context, such as the organization the event belongs to',
     })
     meta: Record<string, unknown>;
 

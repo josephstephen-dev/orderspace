@@ -30,7 +30,9 @@ export class RolesGuard implements CanActivate {
 
         if (!requiredRoles || requiredRoles.length === 0) return true;
 
-        const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
+        const request = context
+            .switchToHttp()
+            .getRequest<AuthenticatedRequest>();
         const user = request.user;
         if (!user) {
             throw new UnauthorizedException('Authentication required');

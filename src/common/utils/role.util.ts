@@ -27,7 +27,10 @@ export function hasMinimumRole(
 }
 
 /** True when `higher` is strictly more senior than `lower`. */
-export function outranks(higher: MembershipRole, lower: MembershipRole): boolean {
+export function outranks(
+    higher: MembershipRole,
+    lower: MembershipRole,
+): boolean {
     return ROLE_LEVEL[higher] > ROLE_LEVEL[lower];
 }
 

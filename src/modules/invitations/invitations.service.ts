@@ -49,7 +49,11 @@ export class InvitationsService {
 
     // ── Organization side (ADMIN and above) ───────────────────────────────
 
-    async send(organizationId: string, actor: ActingMember, dto: CreateInvitationDto) {
+    async send(
+        organizationId: string,
+        actor: ActingMember,
+        dto: CreateInvitationDto,
+    ) {
         const role = dto.role ?? MembershipRole.MEMBER;
         if (!outranks(actor.role, role)) {
             throw new ForbiddenException(
@@ -81,7 +85,8 @@ export class InvitationsService {
             }),
         ]);
 
-        if (!organization) throw new NotFoundException('Organization not found');
+        if (!organization)
+            throw new NotFoundException('Organization not found');
         if (member) {
             throw new ConflictException('This person is already a member');
         }
@@ -189,7 +194,9 @@ export class InvitationsService {
         });
         if (count === 0) {
             await this.findInOrganization(organizationId, id);
-            throw new BadRequestException('Only pending invitations can be revoked');
+            throw new BadRequestException(
+                'Only pending invitations can be revoked',
+            );
         }
         return new InvitationEntity(
             await this.findInOrganization(organizationId, id),
@@ -217,7 +224,9 @@ export class InvitationsService {
             select: { userId: true },
         });
         if (existing) {
-            throw new ConflictException('You are already a member of this organization');
+            throw new ConflictException(
+                'You are already a member of this organization',
+            );
         }
 
         const accepted = await this.prisma.$transaction(async (tx) => {
@@ -228,10 +237,15 @@ export class InvitationsService {
                     status: InvitationStatus.PENDING,
                     expiresAt: { gt: new Date() },
                 },
-                data: { status: InvitationStatus.ACCEPTED, acceptedAt: new Date() },
+                data: {
+                    status: InvitationStatus.ACCEPTED,
+                    acceptedAt: new Date(),
+                },
             });
             if (claimed.count !== 1) {
-                throw new BadRequestException('This invitation is no longer available');
+                throw new BadRequestException(
+                    'This invitation is no longer available',
+                );
             }
             await tx.membership.create({
                 data: {
@@ -247,7 +261,12 @@ export class InvitationsService {
             });
         });
 
-        void this.announceJoin(accepted.organizationId, accepted.organization.name, user, accepted.role);
+        void this.announceJoin(
+            accepted.organizationId,
+            accepted.organization.name,
+            user,
+            accepted.role,
+        );
         return new InvitationEntity(accepted);
     }
 
@@ -261,7 +280,9 @@ export class InvitationsService {
             data: { status: InvitationStatus.DECLINED },
         });
         if (count !== 1) {
-            throw new BadRequestException('This invitation is no longer available');
+            throw new BadRequestException(
+                'This invitation is no longer available',
+            );
         }
         return new InvitationEntity(
             await this.prisma.invitation.findUniqueOrThrow({
@@ -314,7 +335,10 @@ export class InvitationsService {
         }
     }
 
-    private assertOpen(invitation: { status: InvitationStatus; expiresAt: Date }): void {
+    private assertOpen(invitation: {
+        status: InvitationStatus;
+        expiresAt: Date;
+    }): void {
         if (invitation.status !== InvitationStatus.PENDING) {
             throw new BadRequestException(
                 `This invitation is ${invitation.status.toLowerCase()}`,

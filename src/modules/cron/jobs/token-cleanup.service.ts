@@ -18,7 +18,10 @@ export class TokenCleanupService {
 
     constructor(private readonly prisma: PrismaService) {}
 
-    @Cron(CronExpression.EVERY_DAY_AT_2AM, { name: 'token-cleanup', timeZone: 'UTC' })
+    @Cron(CronExpression.EVERY_DAY_AT_2AM, {
+        name: 'token-cleanup',
+        timeZone: 'UTC',
+    })
     handle(): Promise<void> {
         return runJob(this.logger, 'Token cleanup', async () => {
             const now = Date.now();
@@ -31,7 +34,9 @@ export class TokenCleanupService {
                             { expiresAt: { lt: new Date(now) } },
                             {
                                 revokedAt: {
-                                    lt: new Date(now - REVOKED_RETENTION_DAYS * DAY_MS),
+                                    lt: new Date(
+                                        now - REVOKED_RETENTION_DAYS * DAY_MS,
+                                    ),
                                 },
                             },
                         ],

@@ -52,7 +52,11 @@ export class GlobalExceptionFilter implements ExceptionFilter {
             const status = exception.getStatus();
             const body = exception.getResponse();
             if (typeof body === 'string') {
-                return { status, error: this.statusText(status), message: body };
+                return {
+                    status,
+                    error: this.statusText(status),
+                    message: body,
+                };
             }
             const detail = body as {
                 message?: string | string[];
@@ -190,7 +194,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         if (status >= HttpStatus.INTERNAL_SERVER_ERROR) {
             this.logger.error(
                 label,
-                exception instanceof Error ? exception.stack : String(exception),
+                exception instanceof Error
+                    ? exception.stack
+                    : String(exception),
             );
         } else {
             this.logger.warn(`${label} - ${JSON.stringify(message)}`);

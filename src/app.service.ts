@@ -46,6 +46,8 @@ export class AppService {
                 ms,
             );
         });
-        return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+        return Promise.race([promise, timeout]).finally(() =>
+            clearTimeout(timer),
+        );
     }
 }

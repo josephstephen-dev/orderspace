@@ -11,7 +11,10 @@ export class InvitationExpiryService {
 
     constructor(private readonly prisma: PrismaService) {}
 
-    @Cron(CronExpression.EVERY_HOUR, { name: 'invitation-expiry', timeZone: 'UTC' })
+    @Cron(CronExpression.EVERY_HOUR, {
+        name: 'invitation-expiry',
+        timeZone: 'UTC',
+    })
     handle(): Promise<void> {
         return runJob(this.logger, 'Invitation expiry', async () => {
             const { count } = await this.prisma.invitation.updateMany({

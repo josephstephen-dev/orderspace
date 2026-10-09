@@ -38,7 +38,10 @@ export class OrganizationEntity {
     @ApiProperty({ type: String, nullable: true })
     website: string | null;
 
-    @ApiProperty({ example: 'NGN', description: 'ISO 4217 currency of all prices' })
+    @ApiProperty({
+        example: 'NGN',
+        description: 'ISO 4217 currency of all prices',
+    })
     currency: string;
 
     @ApiProperty({ description: 'User ID of the owner' })
@@ -70,14 +73,18 @@ export class MyOrganizationEntity extends OrganizationEntity {
     @ApiProperty({
         enum: MembershipRole,
         nullable: true,
-        description: 'Your role here. Null for platform operators who are not members.',
+        description:
+            'Your role here. Null for platform operators who are not members.',
     })
     role: MembershipRole | null;
 
     @ApiProperty({ type: String, format: 'date-time', nullable: true })
     joinedAt: Date | null;
 
-    constructor(source: OrganizationSource, membership: MembershipSummary | null) {
+    constructor(
+        source: OrganizationSource,
+        membership: MembershipSummary | null,
+    ) {
         super(source);
         this.role = membership?.role ?? null;
         this.joinedAt = membership?.joinedAt ?? null;

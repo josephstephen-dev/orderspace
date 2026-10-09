@@ -31,7 +31,9 @@ export class AppController {
             const down = Object.entries(report.checks)
                 .filter(([, check]) => check.status === 'down')
                 .map(([name]) => name);
-            throw new ServiceUnavailableException(`Unhealthy: ${down.join(', ')}`);
+            throw new ServiceUnavailableException(
+                `Unhealthy: ${down.join(', ')}`,
+            );
         }
         return report;
     }

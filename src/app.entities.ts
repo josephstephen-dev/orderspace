@@ -4,7 +4,10 @@ export class DatabaseCheckEntity {
     @ApiProperty({ enum: ['up', 'down'], example: 'up' })
     status: 'up' | 'down';
 
-    @ApiProperty({ example: 3, description: 'Round trip to the database in milliseconds' })
+    @ApiProperty({
+        example: 3,
+        description: 'Round trip to the database in milliseconds',
+    })
     latencyMs: number;
 }
 
@@ -20,7 +23,10 @@ export class HealthEntity {
     @ApiProperty({ type: String, format: 'date-time' })
     timestamp: string;
 
-    @ApiProperty({ example: 86400, description: 'Seconds since the process started' })
+    @ApiProperty({
+        example: 86400,
+        description: 'Seconds since the process started',
+    })
     uptimeSeconds: number;
 
     @ApiProperty({ type: HealthChecksEntity })

@@ -60,7 +60,9 @@ const SNAPSHOT_LOADERS: Partial<Record<AuditEntity, SnapshotLoader>> = {
               })
             : Promise.resolve(null),
     Invitation: (prisma, id, orgId) =>
-        prisma.invitation.findFirst({ where: { id, ...inOrganization(orgId) } }),
+        prisma.invitation.findFirst({
+            where: { id, ...inOrganization(orgId) },
+        }),
     Category: (prisma, id, orgId) =>
         prisma.category.findFirst({ where: { id, ...inOrganization(orgId) } }),
     Product: (prisma, id, orgId) =>
@@ -69,8 +71,7 @@ const SNAPSHOT_LOADERS: Partial<Record<AuditEntity, SnapshotLoader>> = {
         prisma.customer.findFirst({ where: { id, ...inOrganization(orgId) } }),
     Order: (prisma, id, orgId) =>
         prisma.order.findFirst({ where: { id, ...inOrganization(orgId) } }),
-    Attachment: (prisma, id) =>
-        prisma.attachment.findUnique({ where: { id } }),
+    Attachment: (prisma, id) => prisma.attachment.findUnique({ where: { id } }),
 };
 
 /** Field names whose values must never be written to the audit log. */
@@ -132,14 +133,19 @@ export class AuditLogInterceptor implements NestInterceptor {
         private readonly prisma: PrismaService,
     ) {}
 
-    intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
+    intercept(
+        context: ExecutionContext,
+        next: CallHandler,
+    ): Observable<unknown> {
         const options = this.reflector.get<AuditLogOptions | undefined>(
             AUDIT_LOG_KEY,
             context.getHandler(),
         );
         if (!options) return next.handle();
 
-        const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
+        const request = context
+            .switchToHttp()
+            .getRequest<AuthenticatedRequest>();
         const action =
             options.action ?? METHOD_ACTION[request.method.toUpperCase()];
         if (!action) return next.handle();
@@ -232,10 +238,8 @@ export class AuditLogInterceptor implements NestInterceptor {
         ipAddress: string | null;
         userAgent: string | null;
     }): void {
-        this.prisma.auditLog
-            .create({ data: entry })
-            .catch((error: unknown) => {
-                this.logger.error('Failed to write audit log', error);
-            });
+        this.prisma.auditLog.create({ data: entry }).catch((error: unknown) => {
+            this.logger.error('Failed to write audit log', error);
+        });
     }
 }

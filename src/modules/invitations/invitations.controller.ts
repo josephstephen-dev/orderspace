@@ -58,7 +58,9 @@ export class OrgInvitationsController {
             'Sends a single-use token that expires after 7 days. You can only invite to roles below your own.',
     })
     @ApiCreatedResponse({ type: InvitationEntity })
-    @ApiConflictResponse({ description: 'Already a member, or already invited' })
+    @ApiConflictResponse({
+        description: 'Already a member, or already invited',
+    })
     send(
         @OrgId() organizationId: string,
         @CurrentUser() user: JwtPayload,
@@ -75,7 +77,10 @@ export class OrgInvitationsController {
     @Get()
     @ApiOperation({ summary: 'List invitations' })
     @ApiPageResponse(InvitationEntity)
-    findAll(@OrgId() organizationId: string, @Query() query: QueryInvitationsDto) {
+    findAll(
+        @OrgId() organizationId: string,
+        @Query() query: QueryInvitationsDto,
+    ) {
         return this.invitationsService.findAll(organizationId, query);
     }
 
@@ -89,7 +94,9 @@ export class OrgInvitationsController {
     })
     @ApiParam({ name: 'id', description: 'Invitation ID' })
     @ApiOkResponse({ type: InvitationEntity })
-    @ApiBadRequestResponse({ description: 'Invitation is not pending or expired' })
+    @ApiBadRequestResponse({
+        description: 'Invitation is not pending or expired',
+    })
     resend(
         @OrgId() organizationId: string,
         @Param('id', ParseUUIDPipe) id: string,
@@ -131,7 +138,10 @@ export class InvitationsController {
         description:
             'Public. Shows the organization, role and expiry so the invitee can decide.',
     })
-    @ApiParam({ name: 'token', description: 'The token from the invitation email' })
+    @ApiParam({
+        name: 'token',
+        description: 'The token from the invitation email',
+    })
     @ApiOkResponse({ type: InvitationPreviewEntity })
     @ApiNotFoundResponse({ description: 'Invitation not found' })
     preview(@Param('token') token: string) {

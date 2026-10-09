@@ -7,7 +7,11 @@ import {
     renderLayout,
     table,
 } from './email.layout';
-import { EmailTemplate, type EmailPayloadMap, type RenderedEmail } from './email.types';
+import {
+    EmailTemplate,
+    type EmailPayloadMap,
+    type RenderedEmail,
+} from './email.types';
 
 type Renderers = {
     [K in EmailTemplate]: (payload: EmailPayloadMap[K]) => RenderedEmail;
@@ -22,9 +26,13 @@ const renderers: Renderers = {
                 title: 'Verify your email',
                 preheader: `Your code is ${p.code}`,
                 bodyHtml:
-                    paragraph(`Hi ${p.name}, use this code to verify your email address:`) +
+                    paragraph(
+                        `Hi ${p.name}, use this code to verify your email address:`,
+                    ) +
                     codeBlock(p.code) +
-                    paragraph(`The code expires in ${p.expiresInMinutes} minutes.`),
+                    paragraph(
+                        `The code expires in ${p.expiresInMinutes} minutes.`,
+                    ),
             }),
             text: `Hi ${p.name},\n\nYour verification code is ${p.code}. It expires in ${p.expiresInMinutes} minutes.`,
         };
@@ -36,7 +44,9 @@ const renderers: Renderers = {
             title: 'Reset your password',
             preheader: `Your code is ${p.code}`,
             bodyHtml:
-                paragraph(`Hi ${p.name}, use this code to reset your password:`) +
+                paragraph(
+                    `Hi ${p.name}, use this code to reset your password:`,
+                ) +
                 codeBlock(p.code) +
                 paragraph(
                     `The code expires in ${p.expiresInMinutes} minutes. If you did not ask for this, you can ignore this email.`,
@@ -57,7 +67,9 @@ const renderers: Renderers = {
                         `${p.inviterName} invited you to join ${p.organizationName} as ${p.role}.`,
                     ) +
                     button('Accept invitation', link) +
-                    paragraph(`This invitation expires on ${p.expiresAt.toUTCString()}.`),
+                    paragraph(
+                        `This invitation expires on ${p.expiresAt.toUTCString()}.`,
+                    ),
             }),
             text: `${p.inviterName} invited you to join ${p.organizationName} as ${p.role}.\n\nAccept: ${link}\n\nExpires: ${p.expiresAt.toUTCString()}`,
         };
@@ -69,8 +81,9 @@ const renderers: Renderers = {
             title: `Welcome, ${p.name}`,
             preheader: `You joined ${p.organizationName}`,
             bodyHtml:
-                paragraph(`You are now part of ${p.organizationName} as ${p.role}.`) +
-                button('Open Orderspace', appUrl()),
+                paragraph(
+                    `You are now part of ${p.organizationName} as ${p.role}.`,
+                ) + button('Open Orderspace', appUrl()),
         }),
         text: `Welcome, ${p.name}. You are now part of ${p.organizationName} as ${p.role}.\n\n${appUrl()}`,
     }),
@@ -81,10 +94,18 @@ const renderers: Renderers = {
             title: `Order #${p.orderNumber} confirmed`,
             preheader: `Thanks for your order, ${p.customerName}`,
             bodyHtml:
-                paragraph(`Hi ${p.customerName}, ${p.organizationName} received your order.`) +
+                paragraph(
+                    `Hi ${p.customerName}, ${p.organizationName} received your order.`,
+                ) +
                 table(
                     ['Item', 'SKU', 'Qty', 'Price', 'Total'],
-                    p.items.map((i) => [i.name, i.sku, i.quantity, i.unitPrice, i.lineTotal]),
+                    p.items.map((i) => [
+                        i.name,
+                        i.sku,
+                        i.quantity,
+                        i.unitPrice,
+                        i.lineTotal,
+                    ]),
                 ) +
                 paragraph(`Subtotal: ${p.subtotal}`) +
                 paragraph(`Total: ${p.total}`),
@@ -92,7 +113,9 @@ const renderers: Renderers = {
         text: [
             `Hi ${p.customerName}, ${p.organizationName} received your order #${p.orderNumber}.`,
             '',
-            ...p.items.map((i) => `${i.quantity} x ${i.name} (${i.sku}) - ${i.lineTotal}`),
+            ...p.items.map(
+                (i) => `${i.quantity} x ${i.name} (${i.sku}) - ${i.lineTotal}`,
+            ),
             '',
             `Subtotal: ${p.subtotal}`,
             `Total: ${p.total}`,

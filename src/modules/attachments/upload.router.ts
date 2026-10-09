@@ -32,14 +32,18 @@ export const uploadRouter: FileRouter = {
         .middleware(async ({ req }) => {
             const [type, token] = req.headers.authorization?.split(' ') ?? [];
             if (type?.toLowerCase() !== 'bearer' || !token) {
+                // UploadThingError is the library's own error type
+                // eslint-disable-next-line @typescript-eslint/only-throw-error
                 throw new UploadThingError('Unauthorized');
             }
 
             try {
-                const payload = await getVerifier().verifyAsync<JwtPayload>(token);
+                const payload =
+                    await getVerifier().verifyAsync<JwtPayload>(token);
                 if (!payload.sub) throw new Error('Token has no subject');
                 return { userId: payload.sub };
             } catch {
+                // eslint-disable-next-line @typescript-eslint/only-throw-error
                 throw new UploadThingError('Unauthorized');
             }
         })

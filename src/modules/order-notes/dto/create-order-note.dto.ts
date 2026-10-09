@@ -1,6 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import {
+    IsBoolean,
+    IsNotEmpty,
+    IsOptional,
+    IsString,
+    MaxLength,
+} from 'class-validator';
 import { trimText } from '../../../common/utils/transform.util';
 
 export const MAX_NOTE_LENGTH = 2000;
@@ -16,7 +22,10 @@ export class CreateOrderNoteDto {
     @MaxLength(MAX_NOTE_LENGTH)
     body: string;
 
-    @ApiPropertyOptional({ default: false, description: 'Pinned notes are listed first.' })
+    @ApiPropertyOptional({
+        default: false,
+        description: 'Pinned notes are listed first.',
+    })
     @IsOptional()
     @IsBoolean()
     isPinned?: boolean;

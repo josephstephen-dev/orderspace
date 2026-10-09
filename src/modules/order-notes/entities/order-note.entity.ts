@@ -20,9 +20,14 @@ export interface OrderNoteSource {
 export class OrderNoteEntity {
     @ApiProperty() id: string;
     @ApiProperty() orderId: string;
-    @ApiProperty({ example: 'Customer asked for delivery before Friday.' }) body: string;
+    @ApiProperty({ example: 'Customer asked for delivery before Friday.' })
+    body: string;
     @ApiProperty({ example: false }) isPinned: boolean;
-    @ApiProperty({ example: false, description: 'True once the text has been changed' }) isEdited: boolean;
+    @ApiProperty({
+        example: false,
+        description: 'True once the text has been changed',
+    })
+    isEdited: boolean;
     @ApiProperty({ type: String, format: 'date-time' }) createdAt: Date;
     @ApiProperty({ type: String, format: 'date-time' }) updatedAt: Date;
     @ApiProperty({ type: NoteAuthorEntity }) author: NoteAuthorEntity;

@@ -1,10 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../../../database/prisma.service';
-import { NotificationType, ProductStatus } from '../../../generated/prisma/enums';
+import {
+    NotificationType,
+    ProductStatus,
+} from '../../../generated/prisma/enums';
 import { EmailService } from '../../email/email.service';
 import { EmailTemplate } from '../../email/email.types';
-import { AdminRecipient, MembershipsService } from '../../memberships/memberships.service';
+import {
+    AdminRecipient,
+    MembershipsService,
+} from '../../memberships/memberships.service';
 import { NotificationsService } from '../../notifications/notifications.service';
 import { runJob } from './job-runner';
 
@@ -37,13 +43,19 @@ export class LowStockAlertService {
         private readonly emailService: EmailService,
     ) {}
 
-    @Cron(CronExpression.EVERY_6_HOURS, { name: 'low-stock-alert', timeZone: 'UTC' })
+    @Cron(CronExpression.EVERY_6_HOURS, {
+        name: 'low-stock-alert',
+        timeZone: 'UTC',
+    })
     handle(): Promise<void> {
         return runJob(this.logger, 'Low-stock alert', async () => {
             const reset = await this.resetRecovered();
             const claimed = await this.claimLowStock();
             const alerted = await this.alertOrganizations(claimed);
-            const products = [...claimed.values()].reduce((sum, list) => sum + list.length, 0);
+            const products = [...claimed.values()].reduce(
+                (sum, list) => sum + list.length,
+                0,
+            );
             return `${products} new low-stock product(s), ${alerted} organization(s) alerted, ${reset} recovered`;
         });
     }
@@ -55,7 +67,9 @@ export class LowStockAlertService {
             select: { id: true, stockQuantity: true, lowStockThreshold: true },
         });
         const recovered = flagged
-            .filter((product) => product.stockQuantity > product.lowStockThreshold)
+            .filter(
+                (product) => product.stockQuantity > product.lowStockThreshold,
+            )
             .map((product) => product.id);
         if (recovered.length === 0) return 0;
 
@@ -140,10 +154,14 @@ export class LowStockAlertService {
             } catch (error) {
                 // Let the next run try again.
                 await this.prisma.product.updateMany({
-                    where: { id: { in: products.map((product) => product.id) } },
+                    where: {
+                        id: { in: products.map((product) => product.id) },
+                    },
                     data: { lowStockAlertedAt: null },
                 });
-                this.logger.warn(`Alert for ${organizationId} failed: ${String(error)}`);
+                this.logger.warn(
+                    `Alert for ${organizationId} failed: ${String(error)}`,
+                );
             }
         }
         return alerted;
@@ -179,10 +197,16 @@ export class LowStockAlertService {
                           .slice(0, 3)
                           .map((product) => product.name)
                           .join(', ') +
-                      (products.length > 3 ? `, and ${products.length - 3} more` : ''),
+                      (products.length > 3
+                          ? `, and ${products.length - 3} more`
+                          : ''),
                 resourceType: single ? 'Product' : 'Organization',
                 resourceId: single ? single.id : organizationId,
-                meta: { organizationId, totalCount: products.length, products: shown },
+                meta: {
+                    organizationId,
+                    totalCount: products.length,
+                    products: shown,
+                },
             },
         );
 
@@ -199,7 +223,9 @@ export class LowStockAlertService {
         );
         const failed = results.filter((ok) => !ok).length;
         if (failed > 0) {
-            this.logger.warn(`${failed} low-stock email(s) failed for ${organizationName}`);
+            this.logger.warn(
+                `${failed} low-stock email(s) failed for ${organizationName}`,
+            );
         }
     }
 }

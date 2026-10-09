@@ -12,7 +12,9 @@ export async function runJob(
     const startedAt = Date.now();
     try {
         const summary = await task();
-        logger.log(`${label} finished in ${Date.now() - startedAt}ms: ${summary}`);
+        logger.log(
+            `${label} finished in ${Date.now() - startedAt}ms: ${summary}`,
+        );
     } catch (error) {
         logger.error(
             `${label} failed after ${Date.now() - startedAt}ms`,

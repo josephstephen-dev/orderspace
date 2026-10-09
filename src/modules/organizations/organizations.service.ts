@@ -64,7 +64,8 @@ export class OrganizationsService {
             });
         } catch (error) {
             // Lost a race for the same slug.
-            if (isUniqueViolation(error)) throw new ConflictException(SLUG_TAKEN);
+            if (isUniqueViolation(error))
+                throw new ConflictException(SLUG_TAKEN);
             throw error;
         }
     }
@@ -106,7 +107,8 @@ export class OrganizationsService {
                 },
             },
         });
-        if (!organization) throw new NotFoundException('Organization not found');
+        if (!organization)
+            throw new NotFoundException('Organization not found');
 
         return new OrganizationDetailEntity(
             organization,
@@ -146,7 +148,9 @@ export class OrganizationsService {
     async softDelete(organizationId: string, userId: string): Promise<void> {
         const organization = await this.requireActive(organizationId);
         if (organization.ownerId !== userId) {
-            throw new ForbiddenException('Only the owner can delete the organization');
+            throw new ForbiddenException(
+                'Only the owner can delete the organization',
+            );
         }
 
         await this.prisma.$transaction([
@@ -191,7 +195,9 @@ export class OrganizationsService {
     ) {
         const organization = await this.requireActive(organizationId);
         if (organization.ownerId !== currentOwnerId) {
-            throw new ForbiddenException('Only the owner can transfer ownership');
+            throw new ForbiddenException(
+                'Only the owner can transfer ownership',
+            );
         }
         if (dto.newOwnerId === currentOwnerId) {
             throw new BadRequestException('You are already the owner');
@@ -214,7 +220,11 @@ export class OrganizationsService {
         await this.prisma.$transaction(async (tx) => {
             // The condition makes sure ownership did not move in the meantime.
             const moved = await tx.organization.updateMany({
-                where: { id: organizationId, ownerId: currentOwnerId, deletedAt: null },
+                where: {
+                    id: organizationId,
+                    ownerId: currentOwnerId,
+                    deletedAt: null,
+                },
                 data: { ownerId: dto.newOwnerId },
             });
             if (moved.count !== 1) {
@@ -233,7 +243,10 @@ export class OrganizationsService {
             });
             await tx.membership.update({
                 where: {
-                    userId_organizationId: { userId: currentOwnerId, organizationId },
+                    userId_organizationId: {
+                        userId: currentOwnerId,
+                        organizationId,
+                    },
                 },
                 data: { role: MembershipRole.ADMIN },
             });
@@ -252,7 +265,8 @@ export class OrganizationsService {
         const organization = await this.prisma.organization.findFirst({
             where: { id: organizationId, deletedAt: null },
         });
-        if (!organization) throw new NotFoundException('Organization not found');
+        if (!organization)
+            throw new NotFoundException('Organization not found');
         return organization;
     }
 

@@ -43,7 +43,9 @@ import { OrganizationsModule } from './modules/organizations/organizations.modul
                     secret: jwt.secret,
                     signOptions: {
                         algorithm: 'HS256',
-                        expiresIn: Math.floor(durationToMs(jwt.accessExpiresIn) / 1000),
+                        expiresIn: Math.floor(
+                            durationToMs(jwt.accessExpiresIn) / 1000,
+                        ),
                     },
                     verifyOptions: { algorithms: ['HS256'] },
                 };
@@ -52,7 +54,8 @@ import { OrganizationsModule } from './modules/organizations/organizations.modul
         ThrottlerModule.forRootAsync({
             inject: [ConfigService],
             useFactory: (config: ConfigService) => {
-                const { ttlMs, limit } = config.getOrThrow<ThrottlerConfig>('throttler');
+                const { ttlMs, limit } =
+                    config.getOrThrow<ThrottlerConfig>('throttler');
                 return [{ ttl: ttlMs, limit }];
             },
         }),

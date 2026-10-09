@@ -23,9 +23,10 @@ const SSE_METADATA = '__sse__';
  * Server-Sent Event streams and file downloads pass through untouched.
  */
 @Injectable()
-export class TransformInterceptor<T>
-    implements NestInterceptor<T, ApiResponse<T> | T>
-{
+export class TransformInterceptor<T> implements NestInterceptor<
+    T,
+    ApiResponse<T> | T
+> {
     private readonly reflector = new Reflector();
 
     intercept(

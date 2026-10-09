@@ -36,7 +36,11 @@ export class OrderNotesService {
         private readonly notificationsService: NotificationsService,
     ) {}
 
-    async findAll(organizationId: string, orderId: string, query: PaginationQueryDto) {
+    async findAll(
+        organizationId: string,
+        orderId: string,
+        query: PaginationQueryDto,
+    ) {
         await this.requireOrder(organizationId, orderId);
 
         const where = { orderId };
@@ -44,7 +48,11 @@ export class OrderNotesService {
             this.prisma.orderNote.findMany({
                 where,
                 include: { author: { select: AUTHOR_SELECT } },
-                orderBy: [{ isPinned: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }],
+                orderBy: [
+                    { isPinned: 'desc' },
+                    { createdAt: 'desc' },
+                    { id: 'desc' },
+                ],
                 ...pageArgs(query),
             }),
             this.prisma.orderNote.count({ where }),
@@ -130,7 +138,10 @@ export class OrderNotesService {
 
     // ── Helpers ───────────────────────────────────────────────────────────
 
-    private async requireOrder(organizationId: string, orderId: string): Promise<NoteOrder> {
+    private async requireOrder(
+        organizationId: string,
+        orderId: string,
+    ): Promise<NoteOrder> {
         const order = await this.prisma.order.findFirst({
             where: { id: orderId, organizationId, deletedAt: null },
             select: {

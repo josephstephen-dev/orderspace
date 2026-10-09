@@ -24,7 +24,9 @@ export class JwtAuthGuard implements CanActivate {
         );
         if (isPublic) return true;
 
-        const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
+        const request = context
+            .switchToHttp()
+            .getRequest<AuthenticatedRequest>();
         const token = this.extractBearerToken(request);
         if (!token) {
             throw new UnauthorizedException('Missing access token');

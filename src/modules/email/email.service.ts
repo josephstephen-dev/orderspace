@@ -21,7 +21,8 @@ export class EmailService {
             configService.getOrThrow<ResendConfig>('resend');
         this.from = `${fromName} <${fromEmail}>`;
         // Tests render templates but never call the provider.
-        this.deliveryEnabled = !configService.getOrThrow<AppConfig>('app').isTest;
+        this.deliveryEnabled =
+            !configService.getOrThrow<AppConfig>('app').isTest;
     }
 
     /** Sends one email. Throws if the provider rejects it. */
@@ -33,7 +34,9 @@ export class EmailService {
         const recipient = maskEmail(payload.to);
 
         if (!this.deliveryEnabled) {
-            this.logger.debug(`Skipped "${template}" to ${recipient} (test mode)`);
+            this.logger.debug(
+                `Skipped "${template}" to ${recipient} (test mode)`,
+            );
             return;
         }
 
@@ -62,7 +65,9 @@ export class EmailService {
             await this.send(template, payload);
             return true;
         } catch (error) {
-            this.logger.error(error instanceof Error ? error.message : String(error));
+            this.logger.error(
+                error instanceof Error ? error.message : String(error),
+            );
             return false;
         }
     }
