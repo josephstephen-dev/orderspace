@@ -17,7 +17,7 @@ A multi-tenant **order management API** built on NestJS, Prisma, and PostgreSQL.
 ![Docker](https://img.shields.io/badge/Docker-ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![License](https://img.shields.io/badge/License-Proprietary-B91C1C?style=for-the-badge)
 
-![Orderspace Swagger UI — Organizations](assets/docs/swagger-organizations.png)
+![Orderspace Swagger UI - Organizations](./assets/docs/swagger-organizations.png)
 
 *Swagger UI preview. The `/api/docs` route must be disabled in production and available only in non-production environments.*
 
